@@ -54,14 +54,14 @@ export declare class ZhihuClient {
     constructor(config: ZhihuClientConfig);
     /**
      * 获取用户的收藏夹列表
-     * 知乎 API: /members/{user_id}/collections
+     * 知乎 API: /members/{user_id}/favlists
      */
     getCollections(userId: string): Promise<ZhihuCollectionFolder[]>;
     /**
      * 获取收藏夹中的内容列表
-     * 知乎 API: /collections/{collection_id}/contents
+     * 知乎 API: /collections/{collection_id}/items
      */
-    getCollectionContents(collectionId: string, limit?: number): Promise<ZhihuCollectionItem[]>;
+    getCollectionContents(collectionId: string, limit?: number, offset?: number): Promise<ZhihuCollectionItem[]>;
     /**
      * 获取收藏内容的详细内容（用于 AI 总结）
      * 对于回答：获取回答的详细内容

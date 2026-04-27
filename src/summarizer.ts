@@ -91,13 +91,17 @@ export class Summarizer {
   private buildContentText(folder: ZhihuCollectionFolder): string {
     return folder.items
       .map((item, index) => {
-        const content = item.content || item.excerpt;
+        // 确保 content 是字符串，避免 substring 报错
+        let content = item.content || item.excerpt;
+        if (typeof content !== 'string') {
+          content = String(content);
+        }
         return `
 [${index + 1}] 标题：${item.title}
     类型：${this.typeLabel(item.type)}
     作者：${item.authorName}
     链接：${item.url}
-    内容：${content.substring(0, 2000)}
+     内容：${content.substring(0, 2000)}
 `;
       })
       .join('\n---\n');

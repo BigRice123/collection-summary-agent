@@ -117,9 +117,9 @@ class CollectionSummaryServer {
                 },
                 limit: {
                   type: 'number',
-                  description: '获取数量上限（默认 20）',
+                  description: '获取数量上限（默认 20，最大 200）',
                   minimum: 1,
-                  maximum: 50,
+                  maximum: 200,
                 },
               },
               required: ['collectionId'],

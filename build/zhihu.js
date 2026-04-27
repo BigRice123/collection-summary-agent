@@ -28,11 +28,11 @@ export class ZhihuClient {
     }
     /**
      * 获取用户的收藏夹列表
-     * 知乎 API: /members/{user_id}/collections
+     * 知乎 API: /members/{user_id}/favlists
      */
     async getCollections(userId) {
         try {
-            const response = await this.client.get(`/members/${userId}/collections`, {
+            const response = await this.client.get(`/members/${userId}/favlists`, {
                 params: {
                     limit: 20,
                     offset: 0,
@@ -43,7 +43,7 @@ export class ZhihuClient {
                 id: String(col.id),
                 title: col.title || '未命名收藏夹',
                 description: col.description || '',
-                itemCount: col.content_count || 0,
+                itemCount: col.item_count || 0,
                 items: [],
             }));
         }
@@ -56,30 +56,33 @@ export class ZhihuClient {
     }
     /**
      * 获取收藏夹中的内容列表
-     * 知乎 API: /collections/{collection_id}/contents
+     * 知乎 API: /collections/{collection_id}/items
      */
-    async getCollectionContents(collectionId, limit = 20) {
+    async getCollectionContents(collectionId, limit = 20, offset = 0) {
         try {
-            const response = await this.client.get(`/collections/${collectionId}/contents`, {
+            const response = await this.client.get(`/collections/${collectionId}/items`, {
                 params: {
                     limit,
-                    offset: 0,
+                    offset,
                 },
             });
             const contents = response.data.data || [];
             return contents.map((item) => {
-                const target = item.target || {};
-                const type = item.type || 'answer';
+                // 知乎 API 返回的数据在 content 字段中
+                const content = item.content || {};
+                const type = content.type || 'answer';
                 return {
-                    id: String(target.id || ''),
-                    title: target.title || target.question?.title || '无标题',
+                    id: String(content.id || ''),
+                    title: content.title || content.question?.title || '无标题',
                     type: this.mapContentType(type),
-                    excerpt: target.excerpt || target.content || '',
-                    url: this.buildContentUrl(target, type),
-                    authorName: target.author?.name || '未知作者',
-                    authorUrl: target.author?.url || '',
-                    collectedAt: item.created_time
-                        ? new Date(item.created_time * 1000).toISOString()
+                    excerpt: content.excerpt || '',
+                    // 从 HTML 内容中提取纯文本作为摘要
+                    content: content.content || '',
+                    url: content.url || '',
+                    authorName: content.author?.name || '未知作者',
+                    authorUrl: content.author?.url || '',
+                    collectedAt: content.created_time
+                        ? new Date(content.created_time * 1000).toISOString()
                         : '',
                 };
             });
@@ -114,7 +117,8 @@ export class ZhihuClient {
                 content = response.data.content || '';
             }
             // 去除 HTML 标签，提取纯文本
-            return this.stripHtml(content);
+            const stripped = this.stripHtml(content);
+            return typeof stripped === 'string' ? stripped : String(stripped);
         }
         catch (error) {
             if (axios.isAxiosError(error)) {
@@ -130,12 +134,28 @@ export class ZhihuClient {
     async getAllCollectionsWithContents(userId) {
         // 1. 获取所有收藏夹
         const folders = await this.getCollections(userId);
-        // 2. 逐个获取收藏夹内容
+        // 2. 逐个获取收藏夹内容（获取全部，通过分页）
         for (const folder of folders) {
-            const items = await this.getCollectionContents(folder.id);
-            folder.items = items;
-            // 3. 获取每个内容的详细内容（限制前 10 个，避免请求过多）
-            const detailPromises = items.slice(0, 10).map((item) => this.getContentDetail(item).then((content) => {
+            const allItems = [];
+            let offset = 0;
+            const pageSize = 20;
+            let hasMore = true;
+            while (hasMore) {
+                const items = await this.getCollectionContents(folder.id, pageSize, offset);
+                allItems.push(...items);
+                offset += pageSize;
+                // 如果返回的数量小于 pageSize，说明没有更多了
+                if (items.length < pageSize) {
+                    hasMore = false;
+                }
+                // 最多获取 200 条
+                if (allItems.length >= 200) {
+                    hasMore = false;
+                }
+            }
+            folder.items = allItems;
+            // 3. 获取每个内容的详细内容（限制前 30 个，避免请求过多导致超时）
+            const detailPromises = allItems.slice(0, 30).map((item) => this.getContentDetail(item).then((content) => {
                 item.content = content;
             }));
             await Promise.all(detailPromises);
