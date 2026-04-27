@@ -1,0 +1,19 @@
+{
+  "name": "collection-summary-agent",
+  "version": "0.1.0",
+  "description": "收藏内容总结助手 - 自动抓取知乎收藏内容，生成结构化总结笔记",
+  "type": "module",
+  "scripts": {
+    "build": "tsc && node -e \"require('fs').chmodSync('build/index.js', '755')\"",
+    "start": "node build/index.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "axios": "^1.7.0",
+    "cheerio": "^1.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.7.0"
+  }
+}
