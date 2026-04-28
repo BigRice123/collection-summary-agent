@@ -43,6 +43,7 @@ export class ZhihuClient {
                 id: String(col.id),
                 title: col.title || '未命名收藏夹',
                 description: col.description || '',
+                isPublic: col.is_public !== false,
                 itemCount: col.item_count || 0,
                 items: [],
             }));

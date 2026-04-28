@@ -35,6 +35,8 @@ export interface ZhihuCollectionFolder {
     title: string;
     /** 收藏夹描述 */
     description: string;
+    /** 是否公开 */
+    isPublic: boolean;
     /** 收藏数量 */
     itemCount: number;
     /** 收藏项列表 */

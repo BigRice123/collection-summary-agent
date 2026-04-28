@@ -39,6 +39,8 @@ export interface ZhihuCollectionFolder {
   title: string;
   /** 收藏夹描述 */
   description: string;
+  /** 是否公开 */
+  isPublic: boolean;
   /** 收藏数量 */
   itemCount: number;
   /** 收藏项列表 */
@@ -94,6 +96,7 @@ export class ZhihuClient {
         id: String(col.id),
         title: col.title || '未命名收藏夹',
         description: col.description || '',
+        isPublic: col.is_public !== false,
         itemCount: col.item_count || 0,
         items: [],
       }));

@@ -89,9 +89,9 @@ npm run build
 
 | 工具名称 | 说明 | 参数 |
 |---------|------|------|
-| `fetch_zhihu_collections` | 获取知乎用户的收藏夹列表 | `userId` (必填) |
+| `fetch_zhihu_collections` | 获取知乎用户的收藏夹列表（返回包含 `id`, `title`, `description`, `isPublic`, `itemCount`） | `userId` (必填) |
 | `fetch_zhihu_collection_contents` | 获取指定收藏夹的内容 | `collectionId` (必填), `limit` (可选, 默认20, 最大200) |
-| `fetch_all_zhihu_collections` | 一键获取所有收藏夹及内容 | `userId` (必填) |
+| `fetch_all_zhihu_collections` | 一键获取所有收藏夹及内容（返回含 `isPublic`, 每项含 `hasDetail` 标记） | `userId` (必填) |
 | `summarize_collections` | 总结收藏内容，生成结构化笔记 | `folderIndex` (可选, 指定收藏夹索引) |
 | `export_notes` | 将笔记导出到本地文件 | `outputDir` (可选, 默认 ~/Documents/CollectionNotes) |
 

@@ -232,6 +232,7 @@ class CollectionSummaryServer {
                   id: f.id,
                   title: f.title,
                   description: f.description,
+                  isPublic: f.isPublic,
                   itemCount: f.itemCount,
                 })),
               },
@@ -345,6 +346,7 @@ class CollectionSummaryServer {
                 summary: cachedFolders.map((f) => ({
                   id: f.id,
                   title: f.title,
+                  isPublic: f.isPublic,
                   itemCount: f.items.length,
                   items: f.items.map((item) => ({
                     title: item.title,
